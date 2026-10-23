@@ -1,0 +1,28 @@
+# Continuous integration: on every push or pull request, checks code style and runs tests.
+# The tests only use mock data: they run without Kaggle data.
+name: Tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v6
+        with:
+          enable-cache: true
+
+      - name: Install Python 3.12 and dependencies
+        run: uv sync --frozen
+
+      - name: Check code style (ruff)
+        run: uv run ruff check src tests app
+
+      - name: Run tests (pytest)
+        run: uv run pytest -p no:warnings
